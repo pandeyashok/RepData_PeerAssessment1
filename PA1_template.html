@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Loading and preprocessing the data</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h2>Loading and preprocessing the data</h2>
+
+<h1>Initialize the data.table and ggplot2 package</h1>
+
+<p>library(data.table)
+library(ggplot2)</p>
+
+<h1>Read data from .csv file</h1>
+
+<p>if(!file.exists(&ldquo;./activity.csv&rdquo;)){
+    print(&ldquo;Input file missing&rdquo;)<br/>
+}
+activityData = read.csv(&ldquo;./activity.csv&rdquo;)</p>
+
+<h1>Convert activityData to data table</h1>
+
+<p>actData &lt;- data.table(activityData)</p>
+
+<h2>What is mean total number of steps taken per day?</h2>
+
+<h1>Total number of steps taken each day</h1>
+
+<p>actData_by_date &lt;- as.data.frame(actData[, sum(steps, na.rm = TRUE),by = date])</p>
+
+<h1>Format the date column</h1>
+
+<p>actData_by_date$date &lt;- as.Date(actData_by_date$date,&ldquo;%Y-%m-%d&rdquo;)</p>
+
+<h1>Histogram of total number of steps taken each day</h1>
+
+<p>ggplot(actData_by_date, aes(x=date, y=V1, fill=date))  + 
+        geom_bar(stat=&ldquo;identity&rdquo;) +
+        ylab(&ldquo;Frequency&rdquo;) + xlab(&ldquo;Dates&rdquo;) +
+        labs(title=&ldquo;Histogram for total steps each day&rdquo;) +
+         theme_bw()</p>
+
+<h4>Mean and median by date</h4>
+
+<p>actData_mean_by_date &lt;- as.data.frame(actData[, mean(steps, na.rm = TRUE),
+                                              by = date])</p>
+
+<h2>What is the average daily activity pattern?</h2>
+
+<h1>Average number of steps taken</h1>
+
+<p>actData_avg_by_interval &lt;- as.data.frame(actData[, mean(steps, na.rm = TRUE),
+                                              by = interval])</p>
+
+<h1>Time series plot of average number of steps taken across all days</h1>
+
+<p>ggplot(actData_avg_by_interval, aes(x=interval, y=V1)) + geom_line() +
+        xlab(&ldquo;Hour of the day&rdquo;) + ylab(&ldquo;Average number of steps&rdquo;) +
+        labs(title=&ldquo;Time series plot of average number of steps taken across all days&rdquo;) </p>
+
+<h1>5-minute interval, on average across all the days in the dataset, contains the maximum number of steps</h1>
+
+<p>actData_avg_max_by_interval &lt;- actData_avg_by_interval[actData_avg_by_interval$V1 == max(actData_avg_by_interval$V1),]</p>
+
+<p>print(paste(&ldquo;On an Average people walk &rdquo;,actData_avg_max_by_interval$V1, &ldquo; steps at this time of the day : &rdquo; , actData_avg_max_by_interval$interval));</p>
+
+<h2>Imputing missing values</h2>
+
+<h1>Total number of rows with NAs</h1>
+
+<p>rows_missing_data &lt;- subset(actData,(is.na(actData$steps)))
+print(paste(&ldquo;Total number of rows with missing data - &rdquo;,nrow(rows_missing_data)));</p>
+
+<h1>Strategy for filling in all of the missing values in the dataset</h1>
+
+<h1>Going to replace NAs with mean of the entire column</h1>
+
+<p>df &lt;- actData
+df$steps[is.na(df$steps)] = mean(df$steps, na.rm=TRUE)</p>
+
+<h1>total number of steps taken each day (ater impute)</h1>
+
+<p>df_by_date &lt;- as.data.frame(df[, sum(steps, na.rm = TRUE),by = date])</p>
+
+<h1>Histogram of total number of steps taken each day (after impute)</h1>
+
+<p>df_by_date$date &lt;- as.Date(df_by_date$date,&ldquo;%Y-%m-%d&rdquo;)</p>
+
+<p>ggplot(df_by_date, aes(x=date, y=V1, fill=date))  + 
+        geom_bar(stat=&ldquo;identity&rdquo;) +
+        ylab(&ldquo;Frequency&rdquo;) + xlab(&ldquo;Dates&rdquo;) +
+        labs(title=&ldquo;Histogram for total steps each day (after impute)&rdquo;) +
+        theme_bw()</p>
+
+<h4>Mean and median by date</h4>
+
+<p>df_mean_by_date &lt;- as.data.frame(df[, mean(steps, na.rm = TRUE),
+                                              by = date])</p>
+
+<h1>Merge two means to compare the values</h1>
+
+<p>compare_mean_by_date &lt;- merge(df_mean_by_date,actData_mean_by_date, by = &ldquo;date&rdquo;)</p>
+
+<h2>&gt; All the missing data has a mean value, histogram is more complete now</h2>
+
+<h2>Are there differences in activity patterns between weekdays and weekends?</h2>
+
+<p>df_weekday &lt;- df
+df_weekday$date &lt;- as.Date(df_weekday$date,&ldquo;%Y-%m-%d&rdquo;)
+df_weekday$day=weekdays(df_weekday$date)
+df_weekday$wend &lt;- as.factor(ifelse(weekdays(df_weekday$date) %in% c(&ldquo;Saturday&rdquo;,&ldquo;Sunday&rdquo;), &ldquo;Weekend&rdquo;, &ldquo;Weekday&rdquo;)) </p>
+
+<h1>Seperate Weekdays from weekends</h1>
+
+<p>df_all_weekdays &lt;- subset(df_weekday, df_weekday$wend == &ldquo;Weekday&rdquo;)
+df_all_weekends &lt;- subset(df_weekday, df_weekday$wend == &ldquo;Weekend&rdquo;)</p>
+
+<h1>average number of steps taken (after impute)</h1>
+
+<p>df_avg_all_weekdays_by_interval &lt;- as.data.frame(df_all_weekdays[, mean(steps, na.rm = TRUE),
+                                                 by = interval])
+df_avg_all_weekends_by_interval &lt;- as.data.frame(df_all_weekends[, mean(steps, na.rm = TRUE),
+                                                                 by = interval])</p>
+
+<p>df_avg_all_weekdays_by_interval$day &lt;- &ldquo;weekday&rdquo;
+df_avg_all_weekends_by_interval$day &lt;- &ldquo;weekend&rdquo;
+df_avg_all_days_by_interval &lt;- rbind(df_avg_all_weekdays_by_interval, df_avg_all_weekends_by_interval)</p>
+
+<h1>Time series plot of the interval and the average number of steps taken,</h1>
+
+<h1>averaged across all weekday days or weekend days</h1>
+
+<p>ggplot(df_avg_all_days_by_interval, aes(x=interval, y=V1)) + geom_line() +
+        xlab(&ldquo;Interval&rdquo;) + ylab(&ldquo;Average number of steps&rdquo;) +
+        labs(title=&ldquo;Time series plot of the interval and the average number of steps taken&rdquo;) +
+        facet_wrap(~ day, ncol = 1)</p>
+
+</body>
+
+</html>

@@ -1,12 +1,14 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
+date: "3 Apr 2016"
 output: 
-  html_document:
+  html_document: 
     keep_md: true
 ---
 
 
 ## Loading and preprocessing the data
+```
 # Initialize the data.table and ggplot2 package
 library(data.table)
 library(ggplot2)
@@ -19,13 +21,13 @@ activityData = read.csv("./activity.csv")
 
 # Convert activityData to data table
 actData <- data.table(activityData)
-
+```
 
 
 
 
 ## What is mean total number of steps taken per day?
-
+```
 # Total number of steps taken each day
 actData_by_date <- as.data.frame(actData[, sum(steps, na.rm = TRUE),by = date])
 
@@ -42,13 +44,13 @@ ggplot(actData_by_date, aes(x=date, y=V1, fill=date))  +
 #### Mean and median by date
 actData_mean_by_date <- as.data.frame(actData[, mean(steps, na.rm = TRUE),
                                               by = date])
-
+```
 
 
 
 
 ## What is the average daily activity pattern?
-
+```
 # Average number of steps taken
 actData_avg_by_interval <- as.data.frame(actData[, mean(steps, na.rm = TRUE),
                                               by = interval])
@@ -62,12 +64,14 @@ actData_avg_max_by_interval <- actData_avg_by_interval[actData_avg_by_interval$V
 
 print(paste("On an Average people walk ",actData_avg_max_by_interval$V1, " steps at this time of the day : " , actData_avg_max_by_interval$interval));
 
+```
 
 
 
 
 ## Imputing missing values
 
+```
 # Total number of rows with NAs
 rows_missing_data <- subset(actData,(is.na(actData$steps)))
 print(paste("Total number of rows with missing data - ",nrow(rows_missing_data)));
@@ -97,12 +101,12 @@ df_mean_by_date <- as.data.frame(df[, mean(steps, na.rm = TRUE),
 compare_mean_by_date <- merge(df_mean_by_date,actData_mean_by_date, by = "date")
 ## > All the missing data has a mean value, histogram is more complete now
 
-
+```
 
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
-
+```
 df_weekday <- df
 df_weekday$date <- as.Date(df_weekday$date,"%Y-%m-%d")
 df_weekday$day=weekdays(df_weekday$date)
@@ -129,3 +133,4 @@ ggplot(df_avg_all_days_by_interval, aes(x=interval, y=V1)) + geom_line() +
         xlab("Interval") + ylab("Average number of steps") +
         labs(title="Time series plot of the interval and the average number of steps taken") +
         facet_wrap(~ day, ncol = 1)
+```

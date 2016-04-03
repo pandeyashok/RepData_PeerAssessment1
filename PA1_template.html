@@ -165,134 +165,119 @@ hr {
 <body>
 <h2>Loading and preprocessing the data</h2>
 
-<h1>Initialize the data.table and ggplot2 package</h1>
+<pre><code># Initialize the data.table and ggplot2 package
+library(data.table)
+library(ggplot2)
 
-<p>library(data.table)
-library(ggplot2)</p>
-
-<h1>Read data from .csv file</h1>
-
-<p>if(!file.exists(&ldquo;./activity.csv&rdquo;)){
-    print(&ldquo;Input file missing&rdquo;)<br/>
+# Read data from .csv file
+if(!file.exists(&quot;./activity.csv&quot;)){
+    print(&quot;Input file missing&quot;)          
 }
-activityData = read.csv(&ldquo;./activity.csv&rdquo;)</p>
+activityData = read.csv(&quot;./activity.csv&quot;)
 
-<h1>Convert activityData to data table</h1>
-
-<p>actData &lt;- data.table(activityData)</p>
+# Convert activityData to data table
+actData &lt;- data.table(activityData)
+</code></pre>
 
 <h2>What is mean total number of steps taken per day?</h2>
 
-<h1>Total number of steps taken each day</h1>
+<pre><code># Total number of steps taken each day
+actData_by_date &lt;- as.data.frame(actData[, sum(steps, na.rm = TRUE),by = date])
 
-<p>actData_by_date &lt;- as.data.frame(actData[, sum(steps, na.rm = TRUE),by = date])</p>
+# Format the date column
+actData_by_date$date &lt;- as.Date(actData_by_date$date,&quot;%Y-%m-%d&quot;)
 
-<h1>Format the date column</h1>
+# Histogram of total number of steps taken each day
+ggplot(actData_by_date, aes(x=date, y=V1, fill=date))  + 
+        geom_bar(stat=&quot;identity&quot;) +
+        ylab(&quot;Frequency&quot;) + xlab(&quot;Dates&quot;) +
+        labs(title=&quot;Histogram for total steps each day&quot;) +
+         theme_bw()
 
-<p>actData_by_date$date &lt;- as.Date(actData_by_date$date,&ldquo;%Y-%m-%d&rdquo;)</p>
-
-<h1>Histogram of total number of steps taken each day</h1>
-
-<p>ggplot(actData_by_date, aes(x=date, y=V1, fill=date))  + 
-        geom_bar(stat=&ldquo;identity&rdquo;) +
-        ylab(&ldquo;Frequency&rdquo;) + xlab(&ldquo;Dates&rdquo;) +
-        labs(title=&ldquo;Histogram for total steps each day&rdquo;) +
-         theme_bw()</p>
-
-<h4>Mean and median by date</h4>
-
-<p>actData_mean_by_date &lt;- as.data.frame(actData[, mean(steps, na.rm = TRUE),
-                                              by = date])</p>
+#### Mean and median by date
+actData_mean_by_date &lt;- as.data.frame(actData[, mean(steps, na.rm = TRUE),
+                                              by = date])
+</code></pre>
 
 <h2>What is the average daily activity pattern?</h2>
 
-<h1>Average number of steps taken</h1>
+<pre><code># Average number of steps taken
+actData_avg_by_interval &lt;- as.data.frame(actData[, mean(steps, na.rm = TRUE),
+                                              by = interval])
+# Time series plot of average number of steps taken across all days
+ggplot(actData_avg_by_interval, aes(x=interval, y=V1)) + geom_line() +
+        xlab(&quot;Hour of the day&quot;) + ylab(&quot;Average number of steps&quot;) +
+        labs(title=&quot;Time series plot of average number of steps taken across all days&quot;) 
 
-<p>actData_avg_by_interval &lt;- as.data.frame(actData[, mean(steps, na.rm = TRUE),
-                                              by = interval])</p>
+# 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps
+actData_avg_max_by_interval &lt;- actData_avg_by_interval[actData_avg_by_interval$V1 == max(actData_avg_by_interval$V1),]
 
-<h1>Time series plot of average number of steps taken across all days</h1>
+print(paste(&quot;On an Average people walk &quot;,actData_avg_max_by_interval$V1, &quot; steps at this time of the day : &quot; , actData_avg_max_by_interval$interval));
 
-<p>ggplot(actData_avg_by_interval, aes(x=interval, y=V1)) + geom_line() +
-        xlab(&ldquo;Hour of the day&rdquo;) + ylab(&ldquo;Average number of steps&rdquo;) +
-        labs(title=&ldquo;Time series plot of average number of steps taken across all days&rdquo;) </p>
-
-<h1>5-minute interval, on average across all the days in the dataset, contains the maximum number of steps</h1>
-
-<p>actData_avg_max_by_interval &lt;- actData_avg_by_interval[actData_avg_by_interval$V1 == max(actData_avg_by_interval$V1),]</p>
-
-<p>print(paste(&ldquo;On an Average people walk &rdquo;,actData_avg_max_by_interval$V1, &ldquo; steps at this time of the day : &rdquo; , actData_avg_max_by_interval$interval));</p>
+</code></pre>
 
 <h2>Imputing missing values</h2>
 
-<h1>Total number of rows with NAs</h1>
+<pre><code># Total number of rows with NAs
+rows_missing_data &lt;- subset(actData,(is.na(actData$steps)))
+print(paste(&quot;Total number of rows with missing data - &quot;,nrow(rows_missing_data)));
 
-<p>rows_missing_data &lt;- subset(actData,(is.na(actData$steps)))
-print(paste(&ldquo;Total number of rows with missing data - &rdquo;,nrow(rows_missing_data)));</p>
+# Strategy for filling in all of the missing values in the dataset
+# Going to replace NAs with mean of the entire column
 
-<h1>Strategy for filling in all of the missing values in the dataset</h1>
+df &lt;- actData
+df$steps[is.na(df$steps)] = mean(df$steps, na.rm=TRUE)
 
-<h1>Going to replace NAs with mean of the entire column</h1>
+# total number of steps taken each day (ater impute)
+df_by_date &lt;- as.data.frame(df[, sum(steps, na.rm = TRUE),by = date])
 
-<p>df &lt;- actData
-df$steps[is.na(df$steps)] = mean(df$steps, na.rm=TRUE)</p>
+# Histogram of total number of steps taken each day (after impute)
+df_by_date$date &lt;- as.Date(df_by_date$date,&quot;%Y-%m-%d&quot;)
 
-<h1>total number of steps taken each day (ater impute)</h1>
+ggplot(df_by_date, aes(x=date, y=V1, fill=date))  + 
+        geom_bar(stat=&quot;identity&quot;) +
+        ylab(&quot;Frequency&quot;) + xlab(&quot;Dates&quot;) +
+        labs(title=&quot;Histogram for total steps each day (after impute)&quot;) +
+        theme_bw()
 
-<p>df_by_date &lt;- as.data.frame(df[, sum(steps, na.rm = TRUE),by = date])</p>
+#### Mean and median by date
+df_mean_by_date &lt;- as.data.frame(df[, mean(steps, na.rm = TRUE),
+                                              by = date])
+# Merge two means to compare the values
+compare_mean_by_date &lt;- merge(df_mean_by_date,actData_mean_by_date, by = &quot;date&quot;)
+## &gt; All the missing data has a mean value, histogram is more complete now
 
-<h1>Histogram of total number of steps taken each day (after impute)</h1>
-
-<p>df_by_date$date &lt;- as.Date(df_by_date$date,&ldquo;%Y-%m-%d&rdquo;)</p>
-
-<p>ggplot(df_by_date, aes(x=date, y=V1, fill=date))  + 
-        geom_bar(stat=&ldquo;identity&rdquo;) +
-        ylab(&ldquo;Frequency&rdquo;) + xlab(&ldquo;Dates&rdquo;) +
-        labs(title=&ldquo;Histogram for total steps each day (after impute)&rdquo;) +
-        theme_bw()</p>
-
-<h4>Mean and median by date</h4>
-
-<p>df_mean_by_date &lt;- as.data.frame(df[, mean(steps, na.rm = TRUE),
-                                              by = date])</p>
-
-<h1>Merge two means to compare the values</h1>
-
-<p>compare_mean_by_date &lt;- merge(df_mean_by_date,actData_mean_by_date, by = &ldquo;date&rdquo;)</p>
-
-<h2>&gt; All the missing data has a mean value, histogram is more complete now</h2>
+</code></pre>
 
 <h2>Are there differences in activity patterns between weekdays and weekends?</h2>
 
-<p>df_weekday &lt;- df
-df_weekday$date &lt;- as.Date(df_weekday$date,&ldquo;%Y-%m-%d&rdquo;)
+<pre><code>df_weekday &lt;- df
+df_weekday$date &lt;- as.Date(df_weekday$date,&quot;%Y-%m-%d&quot;)
 df_weekday$day=weekdays(df_weekday$date)
-df_weekday$wend &lt;- as.factor(ifelse(weekdays(df_weekday$date) %in% c(&ldquo;Saturday&rdquo;,&ldquo;Sunday&rdquo;), &ldquo;Weekend&rdquo;, &ldquo;Weekday&rdquo;)) </p>
+df_weekday$wend &lt;- as.factor(ifelse(weekdays(df_weekday$date) %in% c(&quot;Saturday&quot;,&quot;Sunday&quot;), &quot;Weekend&quot;, &quot;Weekday&quot;)) 
 
-<h1>Seperate Weekdays from weekends</h1>
+#  Seperate Weekdays from weekends
+df_all_weekdays &lt;- subset(df_weekday, df_weekday$wend == &quot;Weekday&quot;)
+df_all_weekends &lt;- subset(df_weekday, df_weekday$wend == &quot;Weekend&quot;)
 
-<p>df_all_weekdays &lt;- subset(df_weekday, df_weekday$wend == &ldquo;Weekday&rdquo;)
-df_all_weekends &lt;- subset(df_weekday, df_weekday$wend == &ldquo;Weekend&rdquo;)</p>
-
-<h1>average number of steps taken (after impute)</h1>
-
-<p>df_avg_all_weekdays_by_interval &lt;- as.data.frame(df_all_weekdays[, mean(steps, na.rm = TRUE),
+#  average number of steps taken (after impute)
+df_avg_all_weekdays_by_interval &lt;- as.data.frame(df_all_weekdays[, mean(steps, na.rm = TRUE),
                                                  by = interval])
 df_avg_all_weekends_by_interval &lt;- as.data.frame(df_all_weekends[, mean(steps, na.rm = TRUE),
-                                                                 by = interval])</p>
+                                                                 by = interval])
 
-<p>df_avg_all_weekdays_by_interval$day &lt;- &ldquo;weekday&rdquo;
-df_avg_all_weekends_by_interval$day &lt;- &ldquo;weekend&rdquo;
-df_avg_all_days_by_interval &lt;- rbind(df_avg_all_weekdays_by_interval, df_avg_all_weekends_by_interval)</p>
+df_avg_all_weekdays_by_interval$day &lt;- &quot;weekday&quot;
+df_avg_all_weekends_by_interval$day &lt;- &quot;weekend&quot;
+df_avg_all_days_by_interval &lt;- rbind(df_avg_all_weekdays_by_interval, df_avg_all_weekends_by_interval)
 
-<h1>Time series plot of the interval and the average number of steps taken,</h1>
 
-<h1>averaged across all weekday days or weekend days</h1>
-
-<p>ggplot(df_avg_all_days_by_interval, aes(x=interval, y=V1)) + geom_line() +
-        xlab(&ldquo;Interval&rdquo;) + ylab(&ldquo;Average number of steps&rdquo;) +
-        labs(title=&ldquo;Time series plot of the interval and the average number of steps taken&rdquo;) +
-        facet_wrap(~ day, ncol = 1)</p>
+# Time series plot of the interval and the average number of steps taken, 
+# averaged across all weekday days or weekend days
+ggplot(df_avg_all_days_by_interval, aes(x=interval, y=V1)) + geom_line() +
+        xlab(&quot;Interval&quot;) + ylab(&quot;Average number of steps&quot;) +
+        labs(title=&quot;Time series plot of the interval and the average number of steps taken&quot;) +
+        facet_wrap(~ day, ncol = 1)
+</code></pre>
 
 </body>
 

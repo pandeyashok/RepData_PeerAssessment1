@@ -143,3 +143,4 @@ ggplot(df_avg_all_days_by_interval, aes(x=interval, y=V1)) + geom_line() +
         facet_wrap(~ day, ncol = 1)
 dev.off()        
 ```
+![Caption for the picture.](./figure/plot4.png)

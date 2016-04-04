@@ -38,7 +38,7 @@ actData_by_date <- as.data.frame(actData[, sum(steps, na.rm = TRUE),by = date])
 actData_by_date$date <- as.Date(actData_by_date$date,"%Y-%m-%d")
 
 # Histogram of total number of steps taken each day
-png(filename = "./figure/plot1.png",
+png(filename = "../repos/public/RepData_PeerAssessment1/figure/plot1.png",
 width = 480, height = 480, units = "px", bg = "white")
 ggplot(actData_by_date, aes(x=date, y=V1, fill=date))  + 
         geom_bar(stat="identity") +
@@ -61,7 +61,7 @@ actData_mean_by_date <- as.data.frame(actData[, mean(steps, na.rm = TRUE),
 actData_avg_by_interval <- as.data.frame(actData[, mean(steps, na.rm = TRUE),
                                               by = interval])
 # Time series plot of average number of steps taken across all days
-png(filename = "./figure/plot2.png",
+png(filename = "../repos/public/RepData_PeerAssessment1/figure/plot2.png",
 width = 480, height = 480, units = "px", bg = "white")
 ggplot(actData_avg_by_interval, aes(x=interval, y=V1)) + geom_line() +
         xlab("Hour of the day") + ylab("Average number of steps") +
@@ -98,7 +98,7 @@ df_by_date <- as.data.frame(df[, sum(steps, na.rm = TRUE),by = date])
 # Histogram of total number of steps taken each day (after impute)
 df_by_date$date <- as.Date(df_by_date$date,"%Y-%m-%d")
 
-png(filename = "./figure/plot3.png",
+png(filename = "../repos/public/RepData_PeerAssessment1/figure/plot3.png",
 width = 480, height = 480, units = "px", bg = "white")
 ggplot(df_by_date, aes(x=date, y=V1, fill=date))  + 
         geom_bar(stat="identity") +
@@ -144,7 +144,7 @@ df_avg_all_days_by_interval <- rbind(df_avg_all_weekdays_by_interval, df_avg_all
         
 # Time series plot of the interval and the average number of steps taken, 
 # averaged across all weekday days or weekend days
-png(filename = "C:\\easyfsm\\repos\\public\\RepData_PeerAssessment1\\figure\\plot4.png",
+png(filename = "../repos/public/RepData_PeerAssessment1/figure/plot4.png",
 width = 480, height = 480, units = "px", bg = "white")
 ggplot(df_avg_all_days_by_interval, aes(x=interval, y=V1)) + geom_line() +
         xlab("Interval") + ylab("Average number of steps") +
@@ -152,4 +152,4 @@ ggplot(df_avg_all_days_by_interval, aes(x=interval, y=V1)) + geom_line() +
         facet_wrap(~ day, ncol = 1)
 dev.off()        
 ```
-![Caption for the picture.](./figure/plot4.png)
+![Plot of the interval and the average number of steps](./figure/plot4.png)

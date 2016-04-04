@@ -13,6 +13,7 @@ knitr::opts_chunk$set(fig.width=8, fig.height=6, fig.path='figure/',
 ```
 
 ## Loading and preprocessing the data
+Load the activity.csv file
 ``` 
 
 # Initialize the data.table and ggplot2 package
@@ -33,6 +34,7 @@ actData <- data.table(activityData)
 
 
 ## What is mean total number of steps taken per day?
+Mean is calcualted as shown below
 ```
 # Total number of steps taken each day
 actData_by_date <- as.data.frame(actData[, sum(steps, na.rm = TRUE),by = date])
@@ -54,11 +56,12 @@ dev.off()
 actData_mean_by_date <- as.data.frame(actData[, mean(steps, na.rm = TRUE),
                                               by = date])
 ```
-![Caption for the picture.](./figure/plot1.png)
+![Histogram of total number of steps taken each day](./figure/plot1.png)
 
 
 
 ## What is the average daily activity pattern?
+The average dailt pattern shows that the maximum number of steps walked are at 8:35 am on weekdays
 ```
 # Average number of steps taken
 actData_avg_by_interval <- as.data.frame(actData[, mean(steps, na.rm = TRUE),
@@ -83,7 +86,7 @@ print(paste("On an Average people walk ",actData_avg_max_by_interval$V1, " steps
 
 
 ## Imputing missing values
-
+The strategy for imputing missing values was to replace NAs with the average value
 ```
 # Total number of rows with NAs
 rows_missing_data <- subset(actData,(is.na(actData$steps)))
@@ -124,6 +127,7 @@ compare_mean_by_date <- merge(df_mean_by_date,actData_mean_by_date, by = "date")
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+The difference in the activity patters is clearly visible in the time series plot.
 ```
 df_weekday <- df
 df_weekday$date <- as.Date(df_weekday$date,"%Y-%m-%d")

@@ -165,7 +165,8 @@ hr {
 <body>
 <h2>Loading and preprocessing the data</h2>
 
-<pre><code># Initialize the data.table and ggplot2 package
+<pre><code>
+# Initialize the data.table and ggplot2 package
 library(data.table)
 library(ggplot2)
 
@@ -273,10 +274,14 @@ df_avg_all_days_by_interval &lt;- rbind(df_avg_all_weekdays_by_interval, df_avg_
 
 # Time series plot of the interval and the average number of steps taken, 
 # averaged across all weekday days or weekend days
+png(filename = &quot;plot4.png&quot;,
+width = 480, height = 480, units = &quot;px&quot;,
+bg = &quot;white&quot;)
 ggplot(df_avg_all_days_by_interval, aes(x=interval, y=V1)) + geom_line() +
         xlab(&quot;Interval&quot;) + ylab(&quot;Average number of steps&quot;) +
         labs(title=&quot;Time series plot of the interval and the average number of steps taken&quot;) +
         facet_wrap(~ day, ncol = 1)
+dev.off()        
 </code></pre>
 
 </body>

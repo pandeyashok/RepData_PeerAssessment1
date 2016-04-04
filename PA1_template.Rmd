@@ -1,14 +1,19 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
 date: "3 Apr 2016"
+runtime: shiny 
 output: 
   html_document: 
     keep_md: true
 ---
 
+```{r setup, include = FALSE, cache = FALSE}  
+knitr::opts_chunk$set(error = TRUE)  
+```
 
 ## Loading and preprocessing the data
-```
+``` 
+
 # Initialize the data.table and ggplot2 package
 library(data.table)
 library(ggplot2)
@@ -129,8 +134,12 @@ df_avg_all_days_by_interval <- rbind(df_avg_all_weekdays_by_interval, df_avg_all
         
 # Time series plot of the interval and the average number of steps taken, 
 # averaged across all weekday days or weekend days
+png(filename = "plot4.png",
+width = 480, height = 480, units = "px",
+bg = "white")
 ggplot(df_avg_all_days_by_interval, aes(x=interval, y=V1)) + geom_line() +
         xlab("Interval") + ylab("Average number of steps") +
         labs(title="Time series plot of the interval and the average number of steps taken") +
         facet_wrap(~ day, ncol = 1)
+dev.off()        
 ```
